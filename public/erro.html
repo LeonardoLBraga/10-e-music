@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pagamento não aprovado | Quiosque 10 & Music</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#D4AF37',
+            darkblue: '#0A1A2F'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-darkblue text-white flex items-center justify-center min-h-screen">
+
+  <div class="bg-black/70 p-10 rounded-2xl text-center max-w-md">
+    <h1 class="text-3xl font-bold mb-4">Pagamento não aprovado ❌</h1>
+
+    <p class="text-gray-300 mb-6">
+      Não foi possível concluir seu pagamento.<br>
+      Você pode tentar novamente ou usar outra forma de pagamento.
+    </p>
+
+    <a href="index.html"
+       class="inline-block bg-primary text-black font-semibold px-8 py-3 rounded-xl hover:scale-105 transition">
+      Tentar novamente
+    </a>
+  </div>
+
+</body>
+</html>
