@@ -1,5 +1,6 @@
 import axios from "axios";
-import { db, tentarVenderIngresso } from "../db/database.js";
+import { tentarVenderIngresso } from "../repositories/ingresso.repository.js";
+import { marcarPedidoComoAprovado } from "../repositories/pedido.repository.js";
 
 export async function webhookMercadoPago(req, res) {
   try {
@@ -9,7 +10,7 @@ export async function webhookMercadoPago(req, res) {
       return res.sendStatus(200);
     }
 
-    const response = await axios.get(
+    const { data: payment } = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
@@ -18,32 +19,30 @@ export async function webhookMercadoPago(req, res) {
       }
     );
 
-    const payment = response.data;
-
     if (payment.status !== "approved") {
       return res.sendStatus(200);
     }
 
-    const venda = db.vendas.find(v => v.id === paymentId);
+    // 1️⃣ Marca pedido como aprovado (idempotente)
+    const atualizado = await marcarPedidoComoAprovado({ paymentId });
 
-    if (!venda || venda.status === "approved") {
+    if (!atualizado) {
+      // Já estava aprovado ou não existe
       return res.sendStatus(200);
     }
 
-    const vendido = tentarVenderIngresso();
+    // 2️⃣ Baixa estoque
+    const vendido = await tentarVenderIngresso();
 
     if (!vendido) {
-      console.error("Pagamento aprovado mas estoque esgotado");
+      console.error("⚠️ Pagamento aprovado mas estoque esgotado");
       return res.sendStatus(200);
     }
-
-    venda.status = "approved";
-    venda.approved_at = new Date();
 
     return res.sendStatus(200);
 
   } catch (err) {
-    console.error("Erro no webhook:", err);
+    console.error("❌ Erro no webhook:", err);
     return res.sendStatus(500);
   }
 }

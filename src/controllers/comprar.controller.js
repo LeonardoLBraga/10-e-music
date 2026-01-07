@@ -1,7 +1,6 @@
-import { criarPagamentoAPI } from "../services/payment.service.js";
-import { criarComprador } from "../repositories/buyer.repository.js";
-import { criarPedido } from "../repositories/order.repository.js";
-import { atualizarPaymentId } from "../repositories/order.repository.js";
+import { criarPagamentoAPI } from "../services/pagamento.service.js";
+import { criarComprador } from "../repositories/comprador.repository.js";
+import { criarPedido, atualizarPaymentId } from "../repositories/pedido.repository.js";
 
 export async function comprarIngresso(req, res) {
   try {
@@ -17,7 +16,7 @@ export async function comprarIngresso(req, res) {
     }
 
     // ======================
-    // CRIA COMPRADOR
+    // CRIA COMPRADOR (OU RETORNA EXISTENTE)
     // ======================
     const comprador = await criarComprador({
       name,
@@ -27,32 +26,37 @@ export async function comprarIngresso(req, res) {
     });
 
     // ======================
-    // CRIA PEDIDO (PENDING)
+    // CRIA PEDIDO NO BANCO (STATUS PENDING)
     // ======================
+    // Usando o valor do ingresso do .env ou default 50
     const pedido = await criarPedido({
       buyer_id: comprador.id,
       amount: Number(process.env.INGRESSO_PRECO || 50),
-      status: "pending"
+      status: "pending",         // Mantido no banco
+      payment_mode: "mercado_pago" // novo campo se você adicionou
     });
 
     // ======================
-    // CRIA PAGAMENTO (MP)
+    // CRIA PAGAMENTO NA API EXTERNA
     // ======================
     const pagamento = await criarPagamentoAPI({
       orderId: pedido.id,
       buyer: {
         name,
-        email
-      }
+        email,
+        cpf,
+        phone
+      },
+      amount: pedido.amount      // garante valor correto
     });
 
     // ======================
-    // SALVA ID DO MP
+    // ATUALIZA PEDIDO COM ID DO PAGAMENTO
     // ======================
     await atualizarPaymentId(pedido.id, pagamento.preference_id);
 
     // ======================
-    // REDIRECT FRONT
+    // RETORNA REDIRECIONAMENTO
     // ======================
     return res.json({
       type: "redirect",

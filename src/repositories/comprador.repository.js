@@ -1,4 +1,3 @@
-// src/repositories/buyer.repository.js
 import { pool } from "../db/connection.js";
 
 export async function criarComprador({ name, email, cpf, phone }) {

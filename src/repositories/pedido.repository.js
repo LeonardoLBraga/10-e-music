@@ -1,4 +1,3 @@
-// src/repositories/order.repository.js
 import { pool } from "../db/connection.js";
 
 export async function criarPedido({ buyer_id, amount }) {
@@ -23,4 +22,19 @@ export async function atualizarPaymentId(orderId, paymentId) {
     `,
     [paymentId, orderId]
   );
+}
+
+export async function marcarPedidoComoAprovado({ paymentId }) {
+  const { rowCount } = await pool.query(
+    `
+    UPDATE orders
+    SET status = 'approved',
+        approved_at = NOW()
+    WHERE payment_id = $1
+      AND status != 'approved'
+    `,
+    [paymentId]
+  );
+
+  return rowCount > 0;
 }

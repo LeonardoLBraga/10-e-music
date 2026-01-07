@@ -1,13 +1,28 @@
-import { db } from "../db/database.js";
+import { buscarEstoque } from "../repositories/ingresso.repository.js";
 
-export function getEstoque(req, res) {
-  const total = db.ingressos.total;
-  const vendidos = db.ingressos.vendidos;
-  const disponiveis = total - vendidos;
+export async function getEstoque(req, res) {
+  try {
+    const estoque = await buscarEstoque();
 
-  return res.json({
-    total,
-    vendidos,
-    disponiveis
-  });
+    if (!estoque) {
+      return res.status(404).json({
+        error: "Estoque não inicializado"
+      });
+    }
+
+    const { total, vendidos } = estoque;
+    const disponiveis = total - vendidos;
+
+    return res.json({
+      total,
+      vendidos,
+      disponiveis
+    });
+
+  } catch (err) {
+    console.error("Erro ao buscar estoque:", err);
+    return res.status(500).json({
+      error: "Erro interno ao consultar estoque"
+    });
+  }
 }
