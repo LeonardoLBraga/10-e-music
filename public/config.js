@@ -4,4 +4,4 @@ const isLocalhost =
 
 const API_BASE_URL = isLocalhost
   ? "http://localhost:3000"
-  : "https://api.quiosque10.com"; //trocar aqui pela URL da sua API em produção
+  : "https://api-10-e-music.onrender.com"; //trocar aqui pela URL da sua API em produção

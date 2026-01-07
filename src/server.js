@@ -19,8 +19,7 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   "http://localhost:5500",
   "http://127.0.0.1:5500",
-  "https://quiosque10.com",
-  "https://www.quiosque10.com"
+  "https://one0-e-music.onrender.com"
 ];
 //trocar aqui pela URL da sua API em produção
 
