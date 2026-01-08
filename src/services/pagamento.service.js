@@ -33,9 +33,9 @@ export async function criarPagamentoAPI({ pedido_id, comprador }) {
       external_reference: String(pedido_id),
 
       back_urls: {
-        success: `${process.env.BASE_URL}/sucesso.html`,
-        failure: `${process.env.BASE_URL}/erro.html`,
-        pending: `${process.env.BASE_URL}/pendente.html`
+        success: `${process.env.FRONTEND_URL}/sucesso.html`,
+        failure: `${process.env.FRONTEND_URL}/erro.html`,
+        pending: `${process.env.FRONTEND_URL}/pendente.html`
       },
 
       // auto_return: "approved",
@@ -47,7 +47,7 @@ export async function criarPagamentoAPI({ pedido_id, comprador }) {
         installments: 1
       },
 
-      notification_url: `${process.env.BASE_URL}/webhook/mercadopago`
+      notification_url: `${process.env.BACKEND_URL}/webhook/mercadopago`
     }
   });
 

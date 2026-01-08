@@ -59,7 +59,7 @@ app.listen(PORT, () => {
   console.log("=================================");
   console.log("🌍 Ambiente:", process.env.NODE_ENV || "development");
   console.log("🌐 Porta:", PORT);
-  console.log("🔗 BASE_URL:", process.env.BASE_URL);
+  console.log("🔗 Backend:", process.env.BACKEND_URL);
   console.log("🖥️ Frontend:", process.env.FRONTEND_URL);
   console.log("💰 Preço ingresso:", process.env.INGRESSO_PRECO);
   console.log("🎟️ Ingresso total:", process.env.INGRESSO_TOTAL);
