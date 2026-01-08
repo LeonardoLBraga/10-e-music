@@ -25,11 +25,6 @@ export async function atualizarPreferenceId(pedido_id, preference_id) {
 }
 
 export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
-  console.log("Webhook aprovado:", {
-    pedido_id,
-    paymentId
-  });
-
   const { rowCount } = await pool.query(
     `
     UPDATE pedido
