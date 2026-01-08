@@ -43,3 +43,17 @@ export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
 
   return rowCount > 0;
 }
+
+export async function buscarStatusPedido(pedidoId) {
+  const result = await pool.query(
+    `
+    SELECT status
+    FROM pedido
+    WHERE id = $1
+    LIMIT 1
+    `,
+    [pedidoId]
+  );
+
+  return result.rows[0]; // { status } ou undefined
+}

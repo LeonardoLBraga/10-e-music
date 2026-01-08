@@ -125,6 +125,7 @@ async function comprarIngresso() {
 
     // Redirect Mercado Pago
     if (data.type === "redirect") {
+      localStorage.setItem("pedido_id", data.pedido_id);
       window.location.href = data.url;
       return;
     }

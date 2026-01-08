@@ -6,6 +6,7 @@ import path from "path";
 import comprarRoutes from "./routes/comprar.routes.js";
 import estoqueRoutes from "./routes/estoque.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
+import pedidoRoutes from "./routes/pedido.routes.js";
 
 import { inicializarEstoque } from "./repositories/estoque.repository.js";
 
@@ -45,6 +46,7 @@ await inicializarEstoque(process.env.INGRESSO_TOTAL);
 app.use("/api/comprar", comprarRoutes);
 app.use("/api/estoque", estoqueRoutes);
 app.use("/webhook/mercadopago", webhookRoutes);
+app.use("/api/pedido/status", pedidoRoutes);
 
 
 app.use((req, res) => {

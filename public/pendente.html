@@ -30,11 +30,52 @@
       Assim que for confirmado, seu ingresso será liberado automaticamente.
     </p>
 
-    <a href="index.html"
+    <a href="/index.html"
        class="inline-block bg-primary text-black font-semibold px-8 py-3 rounded-xl hover:scale-105 transition">
       Voltar ao site
     </a>
   </div>
+
+  <script src="config.js"></script>
+
+  <script>
+    let pedidoId = new URLSearchParams(window.location.search).get("pedido");
+
+    // 2️⃣ fallback: localStorage
+    if (!pedidoId) {
+      pedidoId = localStorage.getItem("pedido_id");
+    }
+
+    if (!pedidoId) {
+      console.warn("Pedido ID não encontrado para polling");
+    }
+
+    async function verificarStatus() {
+      if (!pedidoId) return;
+
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/api/pedido/status?pedido_id=${pedidoId}`
+        );
+
+        if (!res.ok) {
+          console.error("Erro ao consultar status");
+          return;
+        }
+
+        const data = await res.json();
+
+        if (data.status === "approved") {
+          localStorage.removeItem("pedido_id");
+          window.location.href = "/sucesso.html";
+        }
+      } catch (err) {
+        console.error("Erro de rede:", err.message);
+      }
+    }
+
+    setInterval(verificarStatus, 3000);
+  </script>
 
 </body>
 </html>
