@@ -40,7 +40,7 @@ app.use(cors({
 app.use(
   express.json({
     verify: (req, res, buf) => {
-      if (req.originalUrl === "/webhook/mercadopago") {
+      if (req.originalUrl.startsWith("/webhook/mercadopago")) {
         req.rawBody = buf.toString("utf8");
       }
     }
