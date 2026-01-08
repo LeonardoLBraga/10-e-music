@@ -3,8 +3,10 @@ import crypto from "crypto";
 export function validarWebhookMercadoPago(req, res, next) {
   try {
     const signatureHeader = req.headers["x-signature"];
-    if (!signatureHeader) {
-      console.warn("[WEBHOOK] Assinatura ausente");
+    const requestId = req.headers["x-request-id"];
+
+    if (!signatureHeader || !requestId) {
+      console.warn("[WEBHOOK] Headers ausentes");
       return res.sendStatus(401);
     }
 
@@ -14,8 +16,8 @@ export function validarWebhookMercadoPago(req, res, next) {
       return res.sendStatus(500);
     }
 
+    // x-signature: ts=123,v1=abc
     const parts = signatureHeader.split(",").map(p => p.trim());
-
     const ts = parts.find(p => p.startsWith("ts="))?.split("=")[1];
     const v1 = parts.find(p => p.startsWith("v1="))?.split("=")[1];
 
@@ -24,12 +26,7 @@ export function validarWebhookMercadoPago(req, res, next) {
       return res.sendStatus(401);
     }
 
-    if (!req.rawBody) {
-      console.error("[WEBHOOK] rawBody ausente");
-      return res.sendStatus(400);
-    }
-
-    const payload = `${ts}.${req.rawBody}`;
+    const payload = `${ts}.${requestId}`;
 
     const expectedSignature = crypto
       .createHmac("sha256", secret)
@@ -47,8 +44,9 @@ export function validarWebhookMercadoPago(req, res, next) {
     }
 
     return next();
+
   } catch (err) {
-    console.error("[WEBHOOK] Erro na validação:", err.message);
+    console.error("[WEBHOOK] Erro na validação:", err);
     return res.sendStatus(401);
   }
 }
