@@ -38,7 +38,7 @@ export async function criarPagamentoAPI({ pedido_id, comprador }) {
         pending: `${process.env.FRONTEND_URL}/pendente.html`
       },
 
-      // auto_return: "approved",
+      auto_return: "approved",
 
       // 👇 AQUI habilita PIX
       payment_methods: {
