@@ -26,6 +26,7 @@ export async function atualizarPreferenceId(pedido_id, preference_id) {
 
 export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
   paymentId = retiraAspas(paymentId);
+  pedido_id = retiraAspas(pedido_id);
 
   const { rowCount } = await pool.query(
     `
@@ -33,7 +34,7 @@ export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
     SET
         status = 'approved',
         payment_id = '$2'
-    WHERE id = $1
+    WHERE id = '$1'
       AND status <> 'approved';
     `,
     [pedido_id, paymentId]

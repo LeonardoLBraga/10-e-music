@@ -44,7 +44,7 @@ export async function webhookMercadoPago(req, res) {
       return res.sendStatus(200);
     }
 
-    const pedido_id = Number(payment.external_reference);
+    const pedido_id = payment.external_reference;
     if (!pedido_id) {
       return res.sendStatus(200);
     }
