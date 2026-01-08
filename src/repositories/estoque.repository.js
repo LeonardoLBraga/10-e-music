@@ -7,8 +7,8 @@ export async function tentarVenderIngresso() {
     await client.query("BEGIN");
 
     const { rows } = await client.query(
-      `SELECT total, vendidos
-       FROM ingressos
+      `SELECT total, vendido
+       FROM estoque_ingresso
        WHERE id = 1
        FOR UPDATE`
     );
@@ -17,16 +17,16 @@ export async function tentarVenderIngresso() {
       throw new Error("Registro de ingressos não encontrado");
     }
 
-    const { total, vendidos } = rows[0];
+    const { total, vendido } = rows[0];
 
-    if (vendidos >= total) {
+    if (vendido >= total) {
       await client.query("ROLLBACK");
       return false;
     }
 
     await client.query(
-      `UPDATE ingressos
-       SET vendidos = vendidos + 1
+      `UPDATE estoque_ingresso
+       SET vendido = vendido + 1
        WHERE id = 1`
     );
 
@@ -44,19 +44,19 @@ export async function tentarVenderIngresso() {
 export async function inicializarEstoque(quantidade) {
   // Cria a tabela se não existir
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS tickets_stock (
+    CREATE TABLE IF NOT EXISTS estoque_ingresso (
       id SERIAL PRIMARY KEY,
       total INT NOT NULL,
-      sold INT NOT NULL DEFAULT 0
+      vendido INT NOT NULL DEFAULT 0
     )
   `);
 
   // Verifica se já existe algum registro
-  const res = await pool.query("SELECT * FROM tickets_stock LIMIT 1");
+  const res = await pool.query("SELECT * FROM estoque_ingresso LIMIT 1");
   if (res.rowCount === 0) {
     const total = Number(quantidade || 150);
     await pool.query(
-      "INSERT INTO tickets_stock (total, sold) VALUES ($1, 0)",
+      "INSERT INTO estoque_ingresso (total, vendido) VALUES ($1, 0)",
       [total]
     );
     console.log(`Estoque inicializado com ${total} ingressos`);
@@ -65,7 +65,7 @@ export async function inicializarEstoque(quantidade) {
 
 export async function buscarEstoque() {
   const result = await pool.query(
-    "SELECT total, sold FROM tickets_stock LIMIT 1"
+    "SELECT total, vendido FROM estoque_ingresso LIMIT 1"
   );
 
   if (result.rowCount === 0) {
@@ -74,6 +74,6 @@ export async function buscarEstoque() {
 
   return {
     total: Number(result.rows[0].total),
-    vendidos: Number(result.rows[0].sold)
+    vendido: Number(result.rows[0].vendido)
   };
 }

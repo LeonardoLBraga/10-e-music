@@ -1,5 +1,5 @@
 import axios from "axios";
-import { tentarVenderIngresso } from "../repositories/ingresso.repository.js";
+import { tentarVenderIngresso } from "../repositories/estoque.repository.js";
 import { marcarPedidoComoAprovado } from "../repositories/pedido.repository.js";
 
 export async function webhookMercadoPago(req, res) {
@@ -23,11 +23,13 @@ export async function webhookMercadoPago(req, res) {
       return res.sendStatus(200);
     }
 
-    // 1️⃣ Marca pedido como aprovado (idempotente)
-    const atualizado = await marcarPedidoComoAprovado({ paymentId });
+    const pedido_id = Number(payment.external_reference);
+    if (!pedido_id) return res.sendStatus(200);
+
+    // 1️⃣ Marca pedido como aprovado
+    const atualizado = await marcarPedidoComoAprovado({ pedido_id, paymentId });
 
     if (!atualizado) {
-      // Já estava aprovado ou não existe
       return res.sendStatus(200);
     }
 

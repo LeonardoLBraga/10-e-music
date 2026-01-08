@@ -1,13 +1,13 @@
 import { pool } from "../db/connection.js";
 
-export async function criarComprador({ name, email, cpf, phone }) {
+export async function criarComprador({ nome, email, cpf, telefone }) {
   const result = await pool.query(
     `
-    INSERT INTO buyers (name, email, cpf, phone)
+    INSERT INTO comprador (nome, email, cpf, telefone)
     VALUES ($1, $2, $3, $4)
     RETURNING *
     `,
-    [name, email, cpf, phone]
+    [nome, email, cpf, telefone]
   );
 
   return result.rows[0];

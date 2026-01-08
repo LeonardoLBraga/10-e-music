@@ -1,39 +1,40 @@
 import { pool } from "../db/connection.js";
 
-export async function criarPedido({ buyer_id, amount }) {
+export async function criarPedido({ comprador_id, quantidade }) {
   const result = await pool.query(
     `
-    INSERT INTO orders (buyer_id, amount, status)
+    INSERT INTO pedido (comprador_id, quantidade, status)
     VALUES ($1, $2, 'pending')
     RETURNING *
     `,
-    [buyer_id, amount]
+    [comprador_id, quantidade]
   );
 
   return result.rows[0];
 }
 
-export async function atualizarPaymentId(orderId, paymentId) {
+export async function atualizarPreferenceId(pedido_id, preference_id) {
   await pool.query(
     `
-    UPDATE orders
-    SET payment_id = $1
+    UPDATE pedido
+    SET preference_id = $1
     WHERE id = $2
     `,
-    [paymentId, orderId]
+    [preference_id, pedido_id]
   );
 }
 
-export async function marcarPedidoComoAprovado({ paymentId }) {
+export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
   const { rowCount } = await pool.query(
     `
-    UPDATE orders
+    UPDATE pedido
     SET status = 'approved',
-        approved_at = NOW()
-    WHERE payment_id = $1
+        approved_at = NOW(),
+        payment_id = $2
+    WHERE pedido_id = $1
       AND status != 'approved'
     `,
-    [paymentId]
+    [pedido_id, paymentId]
   );
 
   return rowCount > 0;

@@ -7,7 +7,7 @@ import comprarRoutes from "./routes/comprar.routes.js";
 import estoqueRoutes from "./routes/estoque.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 
-import { inicializarEstoque } from "./repositories/ingresso.repository.js";
+import { inicializarEstoque } from "./repositories/estoque.repository.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -1,63 +1,47 @@
 import { criarPagamentoAPI } from "../services/pagamento.service.js";
 import { criarComprador } from "../repositories/comprador.repository.js";
-import { criarPedido, atualizarPaymentId } from "../repositories/pedido.repository.js";
+import { criarPedido, atualizarPreferenceId } from "../repositories/pedido.repository.js";
 
 export async function comprarIngresso(req, res) {
   try {
-    // ======================
     // DADOS DO COMPRADOR
-    // ======================
-    const { name, email, cpf, phone } = req.body;
+    const { nome, email, cpf, telefone } = req.body;
 
-    if (!name || !email) {
+    if (!nome || !email) {
       return res.status(400).json({
         error: "Nome e email são obrigatórios"
       });
     }
 
-    // ======================
-    // CRIA COMPRADOR (OU RETORNA EXISTENTE)
-    // ======================
+    // CRIA COMPRADOR
     const comprador = await criarComprador({
-      name,
+      nome,
       email,
       cpf,
-      phone
+      telefone
     });
 
-    // ======================
     // CRIA PEDIDO NO BANCO (STATUS PENDING)
-    // ======================
-    // Usando o valor do ingresso do .env ou default 50
     const pedido = await criarPedido({
-      buyer_id: comprador.id,
-      amount: Number(process.env.INGRESSO_PRECO || 50),
-      status: "pending",         // Mantido no banco
-      payment_mode: "mercado_pago" // novo campo se você adicionou
+      comprador_id: comprador.id,
+      quantidade: 1
     });
 
-    // ======================
     // CRIA PAGAMENTO NA API EXTERNA
-    // ======================
     const pagamento = await criarPagamentoAPI({
-      orderId: pedido.id,
-      buyer: {
-        name,
+      pedido_id: pedido.id,
+      comprador: {
+        nome,
         email,
         cpf,
-        phone
-      },
-      amount: pedido.amount      // garante valor correto
+        telefone
+      }
     });
 
-    // ======================
     // ATUALIZA PEDIDO COM ID DO PAGAMENTO
-    // ======================
-    await atualizarPaymentId(pedido.id, pagamento.preference_id);
+    await atualizarPreferenceId(pedido.id, pagamento.preference_id);
 
-    // ======================
     // RETORNA REDIRECIONAMENTO
-    // ======================
     return res.json({
       type: "redirect",
       url: pagamento.init_point

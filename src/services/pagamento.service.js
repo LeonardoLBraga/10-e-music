@@ -1,8 +1,6 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
-// ======================
 // CONFIGURAÇÃO DO CLIENT
-// ======================
 if (!process.env.MP_ACCESS_TOKEN) {
   throw new Error("MP_ACCESS_TOKEN não configurado no .env");
 }
@@ -11,10 +9,9 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
 });
 
-// ======================
+
 // CRIAR PAGAMENTO (API)
-// ======================
-export async function criarPagamentoAPI({ orderId, buyer }) {
+export async function criarPagamentoAPI({ pedido_id, comprador }) {
   const preference = new Preference(client);
 
   const response = await preference.create({
@@ -29,11 +26,11 @@ export async function criarPagamentoAPI({ orderId, buyer }) {
       ],
 
       payer: {
-        name: buyer?.name,
-        email: buyer?.email
+        name: comprador?.nome,
+        email: comprador?.email
       },
 
-      external_reference: String(orderId),
+      external_reference: String(pedido_id),
 
       back_urls: {
         success: `${process.env.BASE_URL}/sucesso.html`,

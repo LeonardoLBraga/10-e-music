@@ -29,7 +29,7 @@ async function buscarEstoque() {
 // ======================
 async function atualizarContadorIngressos() {
   try {
-    const { total, vendidos, disponiveis } = await buscarEstoque();
+    const { total, vendido, disponiveis } = await buscarEstoque();
 
     const contadorTexto = document.getElementById("contadorTexto");
     const progressBar = document.getElementById("progressBar");
@@ -93,12 +93,12 @@ async function comprarIngresso() {
   buyBtn.innerText = "Processando...";
 
   try {
-    const name = document.getElementById("name").value.trim();
+    const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
     const cpf = document.getElementById("cpf").value.trim();
-    const phone = document.getElementById("phone").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
 
-    if (!name || !email) {
+    if (!nome || !email) {
       alert("Nome e email são obrigatórios");
       return;
     }
@@ -109,10 +109,10 @@ async function comprarIngresso() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        name,
+        nome,
         email,
         cpf,
-        phone
+        telefone
       })
     });
 

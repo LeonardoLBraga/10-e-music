@@ -1,4 +1,4 @@
-import { buscarEstoque } from "../repositories/ingresso.repository.js";
+import { buscarEstoque } from "../repositories/estoque.repository.js";
 
 export async function getEstoque(req, res) {
   try {
@@ -10,12 +10,12 @@ export async function getEstoque(req, res) {
       });
     }
 
-    const { total, vendidos } = estoque;
-    const disponiveis = total - vendidos;
+    const { total, vendido } = estoque;
+    const disponiveis = total - vendido;
 
     return res.json({
       total,
-      vendidos,
+      vendido,
       disponiveis
     });
 
