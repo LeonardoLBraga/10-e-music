@@ -14,9 +14,8 @@ export function validarWebhookMercadoPago(req, res, next) {
       return res.sendStatus(500);
     }
 
-    // Exemplo do header:
-    // ts=1700000000,v1=abcdef123
-    const parts = signatureHeader.split(",");
+    const parts = signatureHeader.split(",").map(p => p.trim());
+
     const ts = parts.find(p => p.startsWith("ts="))?.split("=")[1];
     const v1 = parts.find(p => p.startsWith("v1="))?.split("=")[1];
 
@@ -37,10 +36,9 @@ export function validarWebhookMercadoPago(req, res, next) {
       .update(payload)
       .digest("hex");
 
-    // comparação segura
     const valid = crypto.timingSafeEqual(
-      Buffer.from(expectedSignature),
-      Buffer.from(v1)
+      Buffer.from(expectedSignature, "hex"),
+      Buffer.from(v1, "hex")
     );
 
     if (!valid) {
@@ -49,7 +47,6 @@ export function validarWebhookMercadoPago(req, res, next) {
     }
 
     return next();
-
   } catch (err) {
     console.error("[WEBHOOK] Erro na validação:", err.message);
     return res.sendStatus(401);
