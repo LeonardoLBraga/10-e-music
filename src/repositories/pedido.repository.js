@@ -25,27 +25,26 @@ export async function atualizarPreferenceId(pedido_id, preference_id) {
 }
 
 export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
-  paymentId = retiraAspas(paymentId);
-  pedido_id = retiraAspas(pedido_id);
+  console.log("Webhook aprovado:", {
+    pedido_id,
+    paymentId
+  });
 
   const { rowCount } = await pool.query(
     `
     UPDATE pedido
     SET
-        status = 'approved',
-        payment_id = '$2'
-    WHERE id = '$1'
-      AND status <> 'approved';
+      status = 'approved',
+      payment_id = $2
+    WHERE id = $1
+      AND status <> 'approved'
+    RETURNING id;
     `,
-    [pedido_id, paymentId]
+    [
+      pedido_id,
+      paymentId
+    ]
   );
 
   return rowCount > 0;
-}
-
-function retiraAspas(paymentId) {
-  if (typeof paymentId === "string") {
-    paymentId = paymentId.replace(/(^['"]|['"]$)/g, "");
-  }
-  return paymentId;
 }
