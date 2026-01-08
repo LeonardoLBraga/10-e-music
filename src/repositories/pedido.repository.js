@@ -25,17 +25,26 @@ export async function atualizarPreferenceId(pedido_id, preference_id) {
 }
 
 export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
+  paymentId = retiraAspas(paymentId);
+
   const { rowCount } = await pool.query(
     `
     UPDATE pedido
-    SET status = 'approved',
-        approved_at = NOW(),
-        payment_id = $2
-    WHERE pedido_id = $1
-      AND status != 'approved'
+    SET
+        status = 'approved',
+        payment_id = '$2'
+    WHERE id = $1
+      AND status <> 'approved';
     `,
     [pedido_id, paymentId]
   );
 
   return rowCount > 0;
+}
+
+function retiraAspas(paymentId) {
+  if (typeof paymentId === "string") {
+    paymentId = paymentId.replace(/(^['"]|['"]$)/g, "");
+  }
+  return paymentId;
 }
