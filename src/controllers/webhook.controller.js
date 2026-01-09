@@ -1,6 +1,11 @@
 import axios from "axios";
+import crypto from "crypto";
+
 import { tentarVenderIngresso } from "../repositories/estoque.repository.js";
 import { marcarPedidoComoAprovado } from "../repositories/pedido.repository.js";
+import { criarIngresso } from "../repositories/ingresso.repository.js";
+import { gerarCodigoIngresso } from "../utils/gerarCodigoIngresso.js";
+import { enviarEmailIngresso } from "../services/email.service.js";
 
 export async function webhookMercadoPago(req, res) {
   const requestId = crypto.randomUUID();
@@ -19,7 +24,6 @@ export async function webhookMercadoPago(req, res) {
 
     let payment;
 
-    // 🔁 Consulta MP (com tratamento fino)
     try {
       const { data } = await axios.get(
         `https://api.mercadopago.com/v1/payments/${paymentId}`,
@@ -46,24 +50,16 @@ export async function webhookMercadoPago(req, res) {
 
       console.error(
         `[WEBHOOK][${requestId}] Erro ao consultar MP`,
-        {
-          paymentId,
-          status,
-          message: err.message
-        }
+        { paymentId, status, message: err.message }
       );
 
       return res.sendStatus(200);
     }
 
-    // 🟡 Ainda não aprovado
     if (payment.status !== "approved") {
       console.info(
         `[WEBHOOK][${requestId}] Pagamento não aprovado`,
-        {
-          paymentId,
-          status: payment.status
-        }
+        { paymentId, status: payment.status }
       );
       return res.sendStatus(200);
     }
@@ -77,12 +73,12 @@ export async function webhookMercadoPago(req, res) {
       return res.sendStatus(200);
     }
 
-    const atualizado = await marcarPedidoComoAprovado({
+    const pedido = await marcarPedidoComoAprovado({
       pedido_id,
       paymentId
     });
 
-    if (!atualizado) {
+    if (!pedido) {
       console.info(
         `[WEBHOOK][${requestId}] Pedido já processado`,
         { pedido_id }
@@ -90,7 +86,6 @@ export async function webhookMercadoPago(req, res) {
       return res.sendStatus(200);
     }
 
-    // 📦 Baixa estoque
     const vendido = await tentarVenderIngresso();
 
     if (!vendido) {
@@ -98,10 +93,36 @@ export async function webhookMercadoPago(req, res) {
         `[WEBHOOK][${requestId}] Pagamento aprovado sem estoque`,
         { pedido_id }
       );
-    } else {
-      console.info(
-        `[WEBHOOK][${requestId}] Pedido aprovado com sucesso`,
+      return res.sendStatus(200);
+    }
+
+    const codigo = gerarCodigoIngresso();
+
+    const ingresso = await criarIngresso({
+      pedido_id,
+      codigo
+    });
+
+    const comprador = await buscarCompradorPorPedido(pedido_id);
+
+    if (!comprador) {
+      console.error(
+        `[WEBHOOK][${requestId}] Comprador não encontrado`,
         { pedido_id }
+      );
+      return res.sendStatus(200);
+    }
+
+    if (ingresso) {
+      await enviarEmailIngresso({
+        email: comprador.email,
+        nome: comprador.nome,
+        codigo: ingresso.codigo
+      });
+
+      console.info(
+        `[WEBHOOK][${requestId}] Ingresso criado e enviado`,
+        { pedido_id, codigo: ingresso.codigo }
       );
     }
 

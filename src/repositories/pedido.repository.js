@@ -57,3 +57,17 @@ export async function buscarStatusPedido(pedidoId) {
 
   return result.rows[0]; // { status } ou undefined
 }
+
+export async function buscarCompradorPorPedido(pedido_id) {
+  const result = await pool.query(
+    `
+    SELECT c.nome, c.email
+    FROM pedido p
+    JOIN comprador c ON c.id = p.comprador_id
+    WHERE p.id = $1
+    `,
+    [pedido_id]
+  );
+
+  return result.rows[0] || null;
+}
