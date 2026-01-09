@@ -114,16 +114,18 @@ export async function webhookMercadoPago(req, res) {
     }
 
     if (ingresso) {
-      await enviarEmailIngresso({
-        email: comprador.email,
-        nome: comprador.nome,
-        codigo: ingresso.codigo
-      });
-
-      console.info(
-        `[WEBHOOK][${requestId}] Ingresso criado e enviado`,
-        { pedido_id, codigo: ingresso.codigo }
-      );
+      try {
+        await enviarEmailIngresso({
+          email: comprador.email,
+          nome: comprador.nome,
+          codigo: ingresso.codigo
+        });
+      } catch (err) {
+        console.error(
+          `[WEBHOOK][${requestId}] Falha ao enviar email`,
+          err.message
+        );
+      }
     }
 
     return res.sendStatus(200);

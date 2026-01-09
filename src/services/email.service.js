@@ -1,20 +1,12 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function enviarEmailIngresso({ email, nome, codigo }) {
-  await transporter.sendMail({
-    from: `"Quiosque 10 & Music" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM,
     to: email,
-    subject: "🎟️ Seu ingresso – Carnaval 2026",
+    subject: "🎟️ Seu ingresso – Carnaval Quiosque 10 & Music",
     html: `
       <h2>🎟️ Ingresso confirmado!</h2>
 
