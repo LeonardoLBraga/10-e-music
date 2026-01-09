@@ -39,8 +39,8 @@
   <script src="config.js"></script>
 
   <script>
-    let pedidoId = new URLSearchParams(window.location.search).get("pedido");
-
+    const params = new URLSearchParams(window.location.search);
+    const pedidoId = params.get("external_reference");
     // 2️⃣ fallback: localStorage
     if (!pedidoId) {
       pedidoId = localStorage.getItem("pedido_id");

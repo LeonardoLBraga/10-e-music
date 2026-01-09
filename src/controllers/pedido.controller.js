@@ -4,10 +4,10 @@ export async function getStatusPedido(req, res) {
   try {
     const { pedido_id } = req.query;
 
-    if (!pedido_id) {
-      return res.status(400).json({
-        error: "pedido_id é obrigatório"
-      });
+    if (!pedido_id || pedido_id === "undefined") {
+    return res.status(400).json({
+        error: "pedido_id inválido"
+    });
     }
 
     const pedido = await buscarStatusPedido(pedido_id);
