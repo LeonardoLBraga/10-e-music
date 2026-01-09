@@ -16,6 +16,28 @@ window.addEventListener("resize", () => {
 });
 
 // ======================
+// MODAL DE COMPRA
+// ======================
+
+function abrirModalCompra() {
+  const modal = document.getElementById("modalCompra");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function fecharModalCompra() {
+  const modal = document.getElementById("modalCompra");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+document.getElementById("modalCompra").addEventListener("click", (e) => {
+  if (e.target.id === "modalCompra") {
+    fecharModalCompra();
+  }
+});
+
+// ======================
 // API — ESTOQUE
 // ======================
 async function buscarEstoque() {
