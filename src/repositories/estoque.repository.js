@@ -6,19 +6,22 @@ export async function tentarVenderIngresso() {
   try {
     await client.query("BEGIN");
 
-    const { rows } = await client.query(
-      `SELECT id, total, vendido
-       FROM estoque_ingresso
-       FOR UPDATE
-       LIMIT 1;
+    const result = await client.query(
+      `
+      SELECT id, total, vendido
+      FROM estoque_ingresso
+      FOR UPDATE
+      LIMIT 1
       `
     );
 
-    if (rows.length === 0) {
-      throw new Error("Registro de ingressos não encontrado");
+    if (result.rowCount === 0) {
+      console.error("Estoque não inicializado");
+      await client.query("ROLLBACK");
+      return false;
     }
 
-    const { total, vendido } = rows[0];
+    const { id, total, vendido } = result.rows[0];
 
     if (vendido >= total) {
       await client.query("ROLLBACK");
@@ -26,9 +29,12 @@ export async function tentarVenderIngresso() {
     }
 
     await client.query(
-      `UPDATE estoque_ingresso
-       SET vendido = vendido + 1
-       WHERE id = 1`
+      `
+      UPDATE estoque_ingresso
+      SET vendido = vendido + 1
+      WHERE id = $1
+      `,
+      [id]
     );
 
     await client.query("COMMIT");
@@ -37,10 +43,12 @@ export async function tentarVenderIngresso() {
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
+
   } finally {
     client.release();
   }
 }
+
 
 export async function inicializarEstoque(quantidade) {
   // Cria a tabela se não existir
