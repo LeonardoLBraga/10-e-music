@@ -7,10 +7,11 @@ export async function tentarVenderIngresso() {
     await client.query("BEGIN");
 
     const { rows } = await client.query(
-      `SELECT total, vendido
+      `SELECT id, total, vendido
        FROM estoque_ingresso
-       WHERE id = 1
-       FOR UPDATE`
+       FOR UPDATE
+       LIMIT 1;
+      `
     );
 
     if (rows.length === 0) {
