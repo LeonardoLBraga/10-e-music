@@ -2,7 +2,7 @@ import axios from "axios";
 import crypto from "crypto";
 
 import { tentarVenderIngresso } from "../repositories/estoque.repository.js";
-import { marcarPedidoComoAprovado } from "../repositories/pedido.repository.js";
+import { marcarPedidoComoAprovado, buscarCompradorPorPedido } from "../repositories/pedido.repository.js";
 import { criarIngresso } from "../repositories/ingresso.repository.js";
 import { gerarCodigoIngresso } from "../utils/gerarCodigoIngresso.js";
 import { enviarEmailIngresso } from "../services/email.service.js";
