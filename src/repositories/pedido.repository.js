@@ -48,10 +48,12 @@ export async function buscarStatusPedido(pedidoId) {
   const result = await pool.query(
     `
     SELECT
-      status,
-      codigo
-    FROM pedido
-    WHERE id = $1
+      p.status,
+      i.codigo
+    FROM pedido p
+    LEFT JOIN ingresso i
+      ON i.pedido_id = p.id
+    WHERE p.id = $1
     LIMIT 1
     `,
     [pedidoId]
