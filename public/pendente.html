@@ -41,7 +41,6 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const pedidoId = params.get("external_reference");
-    // 2️⃣ fallback: localStorage
     if (!pedidoId) {
       pedidoId = localStorage.getItem("pedido_id");
     }
@@ -67,7 +66,7 @@
 
         if (data.status === "approved") {
           localStorage.removeItem("pedido_id");
-          window.location.href = "/sucesso.html";
+          window.location.href = `/sucesso.html?pedido_id=${pedidoId}`;
         }
       } catch (err) {
         console.error("Erro de rede:", err.message);
