@@ -50,7 +50,7 @@
   <script src="config.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
-    let pedidoId = params.get("external_reference") || localStorage.getItem("pedido_id");
+    let pedidoId = params.get("pedido_id") || localStorage.getItem("pedido_id");
 
     if (!pedidoId) console.warn("Pedido ID não encontrado");
 
