@@ -5,7 +5,6 @@ import { tentarVenderIngresso } from "../repositories/estoque.repository.js";
 import { marcarPedidoComoAprovado, buscarCompradorPorPedido } from "../repositories/pedido.repository.js";
 import { criarIngresso } from "../repositories/ingresso.repository.js";
 import { gerarCodigoIngresso } from "../utils/gerarCodigoIngresso.js";
-import { enviarEmailIngresso } from "../services/email.service.js";
 
 export async function webhookMercadoPago(req, res) {
   const requestId = crypto.randomUUID();
@@ -111,21 +110,6 @@ export async function webhookMercadoPago(req, res) {
         { pedido_id }
       );
       return res.sendStatus(200);
-    }
-
-    if (ingresso) {
-      try {
-        await enviarEmailIngresso({
-          email: comprador.email,
-          nome: comprador.nome,
-          codigo: ingresso.codigo
-        });
-      } catch (err) {
-        console.error(
-          `[WEBHOOK][${requestId}] Falha ao enviar email`,
-          err.message
-        );
-      }
     }
 
     return res.sendStatus(200);

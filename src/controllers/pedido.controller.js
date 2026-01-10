@@ -5,9 +5,9 @@ export async function getStatusPedido(req, res) {
     const { pedido_id } = req.query;
 
     if (!pedido_id || pedido_id === "undefined") {
-    return res.status(400).json({
+      return res.status(400).json({
         error: "pedido_id inválido"
-    });
+      });
     }
 
     const pedido = await buscarStatusPedido(pedido_id);
@@ -19,7 +19,8 @@ export async function getStatusPedido(req, res) {
     }
 
     return res.json({
-      status: pedido.status
+      status: pedido.status,
+      codigo: pedido.status === "approved" ? pedido.codigo : null
     });
 
   } catch (err) {

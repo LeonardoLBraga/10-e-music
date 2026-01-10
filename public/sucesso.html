@@ -23,12 +23,23 @@
 <body class="bg-darkblue text-white flex items-center justify-center min-h-screen">
 
   <div class="bg-black/70 p-10 rounded-2xl text-center max-w-md">
-    <h1 class="text-3xl font-bold text-primary mb-4">Pagamento aprovado 🎉</h1>
+    <h1 class="text-3xl font-bold text-primary mb-4">🎟️ Ingresso Liberado!</h1>
 
     <p class="text-gray-300 mb-6">
-      Seu ingresso foi confirmado com sucesso.<br>
-      Você receberá os detalhes no e-mail informado.
+      Seu pagamento foi aprovado com sucesso.<br>
+      Copie seu código abaixo e apresente na entrada do evento.
     </p>
+
+    <!-- Código do ingresso -->
+    <input id="codigoIngresso" type="text" readonly
+           class="text-black font-bold text-center w-full py-2 rounded-lg mb-4 text-xl">
+
+    <button id="copiarBtn"
+            class="bg-primary text-black font-semibold px-6 py-2 rounded-xl hover:scale-105 transition mb-4">
+      Copiar Código
+    </button>
+
+    <br>
 
     <a href="index.html"
        class="inline-block bg-primary text-black font-semibold px-8 py-3 rounded-xl hover:scale-105 transition">
@@ -36,5 +47,44 @@
     </a>
   </div>
 
+  <script src="config.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    let pedidoId = params.get("external_reference") || localStorage.getItem("pedido_id");
+
+    if (!pedidoId) console.warn("Pedido ID não encontrado");
+
+    async function buscarCodigo() {
+      if (!pedidoId) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/pedido/status?pedido_id=${pedidoId}`);
+        if (!res.ok) throw new Error("Erro ao consultar pedido");
+
+        const data = await res.json();
+        if (data.status === "approved") {
+          const input = document.getElementById("codigoIngresso");
+          input.value = data.codigo; // código do ingresso do backend
+          localStorage.removeItem("pedido_id");
+        } else {
+          // tenta novamente em 2s se ainda não aprovado
+          setTimeout(buscarCodigo, 2000);
+        }
+      } catch (err) {
+        console.error(err);
+        setTimeout(buscarCodigo, 5000); // tenta de novo em caso de erro de rede
+      }
+    }
+
+    buscarCodigo();
+
+    document.getElementById("copiarBtn").addEventListener("click", () => {
+      const input = document.getElementById("codigoIngresso");
+      input.select();
+      input.setSelectionRange(0, 99999); // para mobile
+      document.execCommand("copy");
+      alert("Código copiado: " + input.value);
+    });
+  </script>
 </body>
 </html>

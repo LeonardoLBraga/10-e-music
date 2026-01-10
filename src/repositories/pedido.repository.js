@@ -47,7 +47,9 @@ export async function marcarPedidoComoAprovado({ pedido_id, paymentId }) {
 export async function buscarStatusPedido(pedidoId) {
   const result = await pool.query(
     `
-    SELECT status
+    SELECT
+      status,
+      codigo
     FROM pedido
     WHERE id = $1
     LIMIT 1
@@ -55,7 +57,7 @@ export async function buscarStatusPedido(pedidoId) {
     [pedidoId]
   );
 
-  return result.rows[0]; // { status } ou undefined
+  return result.rows[0];
 }
 
 export async function buscarCompradorPorPedido(pedido_id) {
