@@ -132,17 +132,44 @@ async function atualizarContadorIngressos() {
 
     if (disponiveis > total * 0.5) {
       progressBar.classList.add("bg-green-500");
-      urgenciaTexto.innerText = "Garanta seu ingresso com tranquilidade";
+      urgenciaTexto.innerText = "Garanta seu ingresso com tranquilidade!";
       urgenciaTexto.className = "mt-4 text-lg text-green-400";
     } else if (disponiveis > total * 0.2) {
       progressBar.classList.add("bg-yellow-400");
-      urgenciaTexto.innerText = "Ingressos acabando";
+      urgenciaTexto.innerText = "Ingressos acabando!";
       urgenciaTexto.className = "mt-4 text-lg text-yellow-400";
+    } else if (disponiveis > 0) {
+      progressBar.classList.add("bg-yellow-400");
+      urgenciaTexto.innerText = "Últimos ingressos!";
+      urgenciaTexto.className = "mt-4 text-lg text-orange-400 animate-pulse";
     } else {
       progressBar.classList.add("bg-red-500");
-      urgenciaTexto.innerText = "Últimos ingressos!";
-      urgenciaTexto.className = "mt-4 text-lg text-red-400 animate-pulse";
+      urgenciaTexto.innerText = "Ingressos esgotados!";
+      urgenciaTexto.className = "mt-4 text-lg text-red-400";
     }
+
+    const buyBtn = document.getElementById("buyBtn");
+
+    if (buyBtn) {
+      if (disponiveis <= 0) {
+        buyBtn.disabled = true;
+        buyBtn.innerText = "Ingressos esgotados";
+        buyBtn.classList.add(
+          "bg-gray-500",
+          "cursor-not-allowed",
+          "opacity-70"
+        );
+      } else {
+        buyBtn.disabled = false;
+        buyBtn.innerText = "Comprar ingresso";
+        buyBtn.classList.remove(
+          "bg-gray-500",
+          "cursor-not-allowed",
+          "opacity-70"
+        );
+      }
+    }
+
   } catch (e) {
     console.error(e);
   }
@@ -212,6 +239,11 @@ async function comprarIngresso() {
     return;
   }
 
+  if (document.getElementById("buyBtn")?.disabled) {
+    mostrarErro("Ingressos esgotados.");
+    return;
+  }
+
   compraEmAndamento = true;
 
   const buyBtn = document.getElementById("buyBtn");
@@ -235,6 +267,12 @@ async function comprarIngresso() {
     const data = await res.json();
 
     if (!res.ok) {
+      if (res.status === 409) {
+        mostrarErro("❌ Ingressos esgotados.");
+        await atualizarContadorIngressos();
+        return;
+      }
+
       mostrarErro(data.error || "Erro ao processar pagamento.");
       return;
     }
@@ -242,6 +280,7 @@ async function comprarIngresso() {
     if (data.type === "redirect") {
       localStorage.setItem("pedido_id", data.pedido_id);
       window.location.href = data.url;
+      return;
     }
 
   } catch (err) {
