@@ -1,12 +1,14 @@
 import { temEstoqueDisponivel } from "../repositories/estoque.repository.js";
+import { criarComprador } from "../repositories/comprador.repository.js";
+import { criarPedido, atualizarPreferenceId } from "../repositories/pedido.repository.js";
+import { criarPagamentoAPI } from "../services/pagamento.service.js";
 
 export async function comprarIngresso(req, res) {
   try {
     const { nome, email, cpf, telefone } = req.body;
-
-    if (!nome || !email) {
+    if (!nome || !email || !cpf || !telefone) {
       return res.status(400).json({
-        error: "Nome e email são obrigatórios"
+        error: "Dados obrigatórios não preenchidos"
       });
     }
 
