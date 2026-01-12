@@ -49,9 +49,17 @@
 
   <script src="config.js"></script>
   <script>
-    const params = new URLSearchParams(window.location.search);
-    let pedidoId = params.get("pedido_id") || localStorage.getItem("pedido_id");
+    function getPedidoId() {
+      const params = new URLSearchParams(window.location.search);
 
+      return (
+        params.get("external_reference") ||
+        params.get("pedido_id") ||
+        localStorage.getItem("pedido_id")
+      );
+    }
+
+    const pedidoId = getPedidoId();
     if (!pedidoId) console.warn("Pedido ID não encontrado");
 
     async function buscarCodigo() {
