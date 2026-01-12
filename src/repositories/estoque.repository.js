@@ -86,3 +86,15 @@ export async function buscarEstoque() {
     vendido: Number(result.rows[0].vendido)
   };
 }
+
+export async function temEstoqueDisponivel() {
+  const result = await pool.query(`
+    SELECT total - vendido AS disponiveis
+    FROM estoque_ingresso
+    LIMIT 1
+  `);
+
+  if (result.rowCount === 0) return false;
+
+  return result.rows[0].disponiveis >= 1;
+}
