@@ -252,10 +252,10 @@ async function comprarIngresso() {
 
   try {
     const payload = {
-      nome: nome.value.trim(),
-      email: email.value.trim(),
-      cpf: cpf.value.trim(),
-      telefone: telefone.value.trim()
+      nome: document.getElementById("nome").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      cpf: document.getElementById("cpf").value.trim(),
+      telefone: document.getElementById("telefone").value.trim()
     };
 
     const res = await fetch(`${API_BASE_URL}/api/comprar`, {
