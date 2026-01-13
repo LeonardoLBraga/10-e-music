@@ -7,6 +7,7 @@ import comprarRoutes from "./routes/comprar.routes.js";
 import estoqueRoutes from "./routes/estoque.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 import pedidoRoutes from "./routes/pedido.routes.js";
+import relatorioRoutes from "./routes/relatorio.routes.js";
 
 import { inicializarEstoque } from "./repositories/estoque.repository.js";
 
@@ -47,6 +48,7 @@ app.use("/api/comprar", comprarRoutes);
 app.use("/api/estoque", estoqueRoutes);
 app.use("/webhook/mercadopago", webhookRoutes);
 app.use("/api/pedido/status", pedidoRoutes);
+app.use("/admin", relatorioRoutes);
 
 
 app.use((req, res) => {
